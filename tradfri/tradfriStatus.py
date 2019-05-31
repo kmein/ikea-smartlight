@@ -23,66 +23,57 @@
 # C0103 -> invalid-name
 # pylint: disable=C0103
 
-import sys
 import os
 import json
 
 global coap
-coap = '/usr/local/bin/coap-client'
+coap = "coap-client"
 timeout = 5
+
 
 def tradfri_get_devices(hubip, apiuser, apikey):
     """ function for getting all tradfri device ids """
-    tradfriHub = 'coaps://{}:5684/15001' .format(hubip)
-    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null' .format(coap, apiuser, apikey,
-                                                                      tradfriHub, timeout)
+    tradfriHub = "coaps://{}:5684/15001".format(hubip)
+    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null'.format(
+        coap, apiuser, apikey, tradfriHub, timeout
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap.\n')
-        sys.exit(1)
+    result = os.popen(api)
 
-    return json.loads(result.read().strip('\n').split('\n')[-1])
+    return json.loads(result.read().strip("\n").split("\n")[-1])
+
 
 def tradfri_get_lightbulb(hubip, apiuser, apikey, deviceid):
     """ function for getting tradfri lightbulb information """
-    tradfriHub = 'coaps://{}:5684/15001/{}' .format(hubip, deviceid)
-    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null' .format(coap, apiuser, apikey,
-                                                                      tradfriHub, timeout)
+    tradfriHub = "coaps://{}:5684/15001/{}".format(hubip, deviceid)
+    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null'.format(
+        coap, apiuser, apikey, tradfriHub, timeout
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap.\n')
-        sys.exit(1)
+    result = os.popen(api)
 
-    return json.loads(result.read().strip('\n').split('\n')[-1])
+    return json.loads(result.read().strip("\n").split("\n")[-1])
+
 
 def tradfri_get_groups(hubip, apiuser, apikey):
     """ function for getting tradfri groups """
-    tradfriHub = 'coaps://{}:5684/15004'.format(hubip)
-    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null' .format(coap, apiuser, apikey,
-                                                                      tradfriHub, timeout)
+    tradfriHub = "coaps://{}:5684/15004".format(hubip)
+    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null'.format(
+        coap, apiuser, apikey, tradfriHub, timeout
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap.\n')
-        sys.exit(1)
+    result = os.popen(api)
 
-    return json.loads(result.read().strip('\n').split('\n')[-1])
+    return json.loads(result.read().strip("\n").split("\n")[-1])
+
 
 def tradfri_get_group(hubip, apiuser, apikey, groupid):
     """ function for getting tradfri group information """
-    tradfriHub = 'coaps://{}:5684/15004/{}'.format(hubip, groupid)
-    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null' .format(coap, apiuser, apikey,
-                                                                      tradfriHub, timeout)
+    tradfriHub = "coaps://{}:5684/15004/{}".format(hubip, groupid)
+    api = '{} -m get -u "{}" -k "{}" "{}" -B {} 2> /dev/null'.format(
+        coap, apiuser, apikey, tradfriHub, timeout
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap.\n')
-        sys.exit(1)
+    result = os.popen(api)
 
-    return json.loads(result.read().strip('\n').split('\n')[-1])
+    return json.loads(result.read().strip("\n").split("\n")[-1])

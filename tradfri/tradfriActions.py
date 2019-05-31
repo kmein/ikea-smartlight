@@ -23,29 +23,26 @@
 # C0103 -> invalid-name
 # pylint: disable=C0103
 
-import sys
 import os
 
 global coap
-coap = '/usr/local/bin/coap-client'
+coap = "coap-client"
+
 
 def tradfri_power_light(hubip, apiuser, apikey, lightbulbid, value):
     """ function for power on/off tradfri lightbulb """
-    tradfriHub = 'coaps://{}:5684/15001/{}' .format(hubip, lightbulbid)
+    tradfriHub = "coaps://{}:5684/15001/{}".format(hubip, lightbulbid)
 
-    if value == 'on':
+    if value == "on":
         payload = '{ "3311": [{ "5850": 1 }] }'
     else:
         payload = '{ "3311": [{ "5850": 0 }] }'
 
-    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"' .format(coap, apiuser, apikey,
-                                                                          payload, tradfriHub)
+    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(
+        coap, apiuser, apikey, payload, tradfriHub
+    )
 
-    if os.path.exists(coap):
-        os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap\n')
-        sys.exit(1)
+    os.popen(api)
 
     return True
 
@@ -53,76 +50,66 @@ def tradfri_power_light(hubip, apiuser, apikey, lightbulbid, value):
 def tradfri_dim_light(hubip, apiuser, apikey, lightbulbid, value):
     """ function for dimming tradfri lightbulb """
     dim = float(value) * 2.55
-    tradfriHub = 'coaps://{}:5684/15001/{}'.format(hubip, lightbulbid)
+    tradfriHub = "coaps://{}:5684/15001/{}".format(hubip, lightbulbid)
     payload = '{ "3311" : [{ "5851" : %s }] }' % int(dim)
 
-    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(coap, apiuser, apikey,
-                                                                         payload, tradfriHub)
+    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(
+        coap, apiuser, apikey, payload, tradfriHub
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap\n')
-        sys.exit(1)
+    result = os.popen(api)
 
     return result
+
 
 def tradfri_color_light(hubip, apiuser, apikey, lightbulbid, value):
     """ function for color temperature tradfri lightbulb """
-    tradfriHub = 'coaps://{}:5684/15001/{}'.format(hubip, lightbulbid)
+    tradfriHub = "coaps://{}:5684/15001/{}".format(hubip, lightbulbid)
 
-    if value == 'warm':
+    if value == "warm":
         payload = '{ "3311" : [{ "5709" : %s, "5710": %s }] }' % ("33135", "27211")
-    elif value == 'normal':
+    elif value == "normal":
         payload = '{ "3311" : [{ "5709" : %s, "5710": %s }] }' % ("30140", "26909")
-    elif value == 'cold':
+    elif value == "cold":
         payload = '{ "3311" : [{ "5709" : %s, "5710": %s }] }' % ("24930", "24684")
 
-    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(coap, apiuser, apikey,
-                                                                         payload, tradfriHub)
+    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(
+        coap, apiuser, apikey, payload, tradfriHub
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap\n')
-        sys.exit(1)
+    result = os.popen(api)
 
     return result
 
+
 def tradfri_power_group(hubip, apiuser, apikey, groupid, value):
     """ function for power on/off tradfri lightbulb """
-    tradfriHub = 'coaps://{}:5684/15004/{}' .format(hubip, groupid)
+    tradfriHub = "coaps://{}:5684/15004/{}".format(hubip, groupid)
 
-    if value == 'on':
+    if value == "on":
         payload = '{ "5850" : 1 }'
     else:
         payload = '{ "5850" : 0 }'
 
-    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"' .format(coap, apiuser, apikey,
-                                                                          payload, tradfriHub)
+    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(
+        coap, apiuser, apikey, payload, tradfriHub
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap\n')
-        sys.exit(1)
+    result = os.popen(api)
 
     return result
 
 
 def tradfri_dim_group(hubip, apiuser, apikey, groupid, value):
     """ function for dimming tradfri lightbulb """
-    tradfriHub = 'coaps://{}:5684/15004/{}'.format(hubip, groupid)
+    tradfriHub = "coaps://{}:5684/15004/{}".format(hubip, groupid)
     dim = float(value) * 2.55
     payload = '{ "5851" : %s }' % int(dim)
 
-    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(coap, apiuser, apikey,
-                                                                         payload, tradfriHub)
+    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(
+        coap, apiuser, apikey, payload, tradfriHub
+    )
 
-    if os.path.exists(coap):
-        result = os.popen(api)
-    else:
-        sys.stderr.write('[-] libcoap: could not find libcoap\n')
-        sys.exit(1)
+    result = os.popen(api)
 
     return result
