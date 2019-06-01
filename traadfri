@@ -8,7 +8,7 @@ and the API key in TRAADFRI_KEY.
 
 Usage:
     traadfri (bulb|group) <id> [-h] [--dim=<brightness>] [--warm | --normal | --cold] [--on | --off]
-    traadfri info
+    traadfri status
 
 Options:
     --warm              colour light(s) warm
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     api_user = os.environ["TRAADFRI_USER"]
     api_key = os.environ["TRAADFRI_KEY"]
 
-    if arguments["info"]:
+    if arguments["status"]:
         coap_get = partial(traadfri.coap_get, api_user, api_key)
 
         bulbs = [
@@ -97,14 +97,3 @@ if __name__ == "__main__":
             coap_put(traadfri.light_colour(traadfri.LightColour.NORMAL))
         elif arguments["--cold"]:
             coap_put(traadfri.light_colour(traadfri.LightColour.COLD))
-
-        if (
-            not arguments["--cold"]
-            and not arguments["--warm"]
-            and not arguments["--normal"]
-            and not arguments["--dim"]
-            and not arguments["--off"]
-            and not arguments["--on"]
-        ):
-            output = coap_get()
-            print(output)
