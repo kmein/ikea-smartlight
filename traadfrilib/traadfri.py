@@ -13,7 +13,18 @@ class LightColour(enum.Enum):
 
 
 def print_group_info(group: dict):
-    pass
+    try:
+        active = group["5850"] == 1
+        group_id = group["9003"]
+        group_name = group["9001"]
+        print(
+            "{} (#{}): {}",
+            color(group_name, style="bold"),
+            group_id,
+            color("on", fg="green") if active else color("off", fg="red"),
+        )
+    except KeyError:
+        pass
 
 
 def print_bulb_info(bulb: dict):
