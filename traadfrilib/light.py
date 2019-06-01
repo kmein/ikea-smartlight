@@ -3,9 +3,30 @@ from decimal import Decimal, getcontext
 
 
 class LightColour(enum.Enum):
-    WARM = 1
-    NORMAL = 0
-    COLD = -1
+    White = "f5faf6"
+    Warm = "f1e0b5"
+    Glow = "efd275"
+
+    Blue = "4a418a"
+    LightBlue = "6c83ba"
+    SaturatedPurple = "8f2686"
+    Lime = "a9d62b"
+    LightPurple = "c984bb"
+    Yellow = "d6e44b"
+    SaturatedPink = "d9337c"
+    DarkPeach = "da5d41"
+    SaturatedRed = "dc4b31"
+    ColdSky = "dcf0f8"
+    Pink = "e491af"
+    Peach = "e57345"
+    WarmAmber = "e78834"
+    LightPink = "e8bedd"
+    CoolDaylight = "eaf6fb"
+    Candlelight = "ebb63e"
+    WarmGlow = "efd275"
+    WarmWhite = "f1e0b5"
+    Sunrise = "f2eccf"
+    CoolWhite = "f5faf6"
 
 
 def toggle(active: bool) -> dict:
@@ -21,11 +42,4 @@ def dim(brightness: int) -> dict:
 
 def colour(colour: LightColour) -> dict:
     """Returns the settings payload for changing a light's colour."""
-    if colour is LightColour.WARM:
-        return {5709: 33135, 5710: 27211}
-    elif colour is LightColour.NORMAL:
-        return {5709: 30140, 5710: 26909}
-    elif colour is LightColour.COLD:
-        return {5709: 24930, 5710: 24684}
-    else:
-        raise ValueError()
+    return {5706: colour.value}

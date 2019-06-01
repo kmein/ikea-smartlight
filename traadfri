@@ -7,16 +7,15 @@ the user name in TRAADFRI_USER,
 and the API key in TRAADFRI_KEY.
 
 Usage:
-    traadfri (bulb|group) <id> [-h] [--dim=<brightness>] [--warm | --normal | --cold] [--on | --off]
+    traadfri (bulb|group) <id> [-h] [--dim=<brightness>] [--colour=<colour>] [--on | --off]
     traadfri status
+    traadfri colours
 
 Options:
-    --warm              colour light(s) warm
-    --normal            colour light(s) normal
-    --cold              colour light(s) cold
     --on                turn light(s) on
     --off               turn light(s) off
     --dim=<brightness>  dim light(s) (1-100)
+    --colour=<colour>   change light(s) to colour
     -h, --help          show this help dialogue
 """
 
@@ -33,7 +32,7 @@ from traadfrilib import status, light, uri, coap
 if __name__ == "__main__":
     arguments = docopt(__doc__)
 
-    print(arguments)
+    # print(arguments)
 
     if (
         "TRAADFRI_KEY" not in os.environ
@@ -70,6 +69,9 @@ if __name__ == "__main__":
 
         for group in groups:
             status.group(group)
+    elif arguments["colours"]:
+        for colour in light.LightColour:
+            print(colour.name)
     else:
         traadfri_id = int(arguments["<id>"])
 
@@ -87,12 +89,13 @@ if __name__ == "__main__":
 
         if arguments["--dim"]:
             brightness_schema = Schema(And(Use(int), lambda n: 1 <= n <= 100))
-            brightness = brightness_schema.validate(arguments["<brightness>"])
+            brightness = brightness_schema.validate(arguments["--dim"])
             coap_put(light.dim(brightness))
 
-        if arguments["--warm"]:
-            coap_put(light.colour(light.LightColour.WARM))
-        elif arguments["--normal"]:
-            coap_put(light.colour(light.LightColour.NORMAL))
-        elif arguments["--cold"]:
-            coap_put(light.colour(light.LightColour.COLD))
+        if arguments["--colour"]:
+            colour_schema = Schema(
+                Use(lambda name: light.LightColour[name]),
+                lambda c: c in (colour.name for colour in light.LightColour),
+            )
+            colour = colour_schema.validate(arguments["--colour"])
+            coap_put(light.colour(colour))
