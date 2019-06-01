@@ -1,15 +1,19 @@
 { python3Packages, lib }:
 python3Packages.buildPythonApplication rec {
   pname = "ikea-smartlight";
-  version = "0.1.0";
+  version = "2.0.0";
 
   src = ./.;
 
-  propagatedBuildInputs = [
-    python3Packages.docopt
-    python3Packages.schema
-    python3Packages.ansicolors
+  propagatedBuildInputs = with python3Packages; [
+    docopt
+    schema
+    ansicolors
   ];
 
-  meta = with lib; {};
+  meta = with lib; {
+    description = "IKEA Trådfri command line interface.";
+    license = licenses.gpl3;
+    platforms = platforms.all;
+  };
 }
