@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
         bulbs = [
             coap_get(uri.bulb(hub_ip, index))
-            for index, _ in enumerate(coap_get(uri.bulb(hub_ip, None)))
+            for index, _ in enumerate(coap_get(uri.bulb(hub_ip)))
         ]
 
         for bulb in bulbs:
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
         groups = [
             coap_get(uri.group(hub_ip, index))
-            for index, _ in enumerate(coap_get(uri.group(hub_ip, None)))
+            for index, _ in enumerate(coap_get(uri.group(hub_ip)))
         ]
 
         for group in groups:

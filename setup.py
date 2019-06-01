@@ -5,5 +5,6 @@ setup(
     version="2.0.0",
     scripts=["./traadfri"],
     install_requires=["docopt", "schema", "ansicolors"],
-    packages=find_packages(),
+    packages=["traadfrilib"],
+    test_suite="traadfrilib.tests",
 )
