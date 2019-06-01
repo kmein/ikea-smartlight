@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""
+IKEA Trådfri command line interface.
+
+The gateway address must be specified in TRAADFRI_HUB,
+the user name in TRAADFRI_USER,
+and the API key in TRAADFRI_KEY.
+
+Usage:
+    traadfri (bulb|group) <id> [-h] [--dim=<brightness>] [--warm | --normal | --cold] [--on | --off]
+    traadfri info
+
+Options:
+    --warm              colour light(s) warm
+    --normal            colour light(s) normal
+    --cold              colour light(s) cold
+    --on                turn light(s) on
+    --off               turn light(s) off
+    --dim=<brightness>  dim light(s) (1-100)
+    -h, --help          show this help dialogue
+"""
+
+from functools import partial
+import os
+import sys
+import time
+
+from docopt import docopt
+from schema import And, Use, Schema
+
+from traadfrilib import traadfri
+
+
+if __name__ == "__main__":
+    arguments = docopt(__doc__, version="Trådfri 0.1.0")
+
+    print(arguments)
+
+    if (
+        "TRAADFRI_KEY" not in os.environ
+        or "TRAADFRI_USER" not in os.environ
+        or "TRAADFRI_HUB" not in os.environ
+    ):
+        print(
+            "The gateway address must be specified in TRAADFRI_HUB, "
+            "the user name in TRAADFRI_USER, "
+            "and the API key in TRAADFRI_KEY.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    hub_ip = os.environ["TRAADFRI_HUB"]
+    api_user = os.environ["TRAADFRI_USER"]
+    api_key = os.environ["TRAADFRI_KEY"]
+
+    if arguments["info"]:
+        coap_get = partial(traadfri.coap_get, api_user, api_key)
+
+        bulbs = [
+            coap_get(traadfri.traadfri_bulb(hub_ip, index))
+            for index, _ in enumerate(coap_get(traadfri.traadfri_bulb(hub_ip, None)))
+        ]
+
+        for bulb in bulbs:
+            traadfri.print_bulb_info(bulb)
+
+        groups = [
+            coap_get(traadfri.traadfri_group(hub_ip, index))
+            for index, _ in enumerate(coap_get(traadfri.traadfri_group(hub_ip, None)))
+        ]
+
+        for group in groups:
+            traadfri.print_group_info(group)
+    else:
+        traadfri_id = int(arguments["<id>"])
+
+        if arguments["bulb"]:
+            uri = traadfri.traadfri_bulb(hub_ip, traadfri_id)
+        elif arguments["group"]:
+            uri = traadfri.traadfri_group(hub_ip, traadfri_id)
+
+        coap_put = partial(traadfri.coap_put, api_user, api_key, uri)
+
+        if arguments["--on"]:
+            coap_put(traadfri.light_toggle(False))
+        elif arguments["--off"]:
+            coap_put(traadfri.light_toggle(True))
+
+        if arguments["--dim"]:
+            brightness_schema = Schema(And(Use(int), lambda n: 1 <= n <= 100))
+            brightness = brightness_schema.validate(arguments["<brightness>"])
+            coap_put(traadfri.light_dim(brightness))
+
+        if arguments["--warm"]:
+            coap_put(traadfri.light_colour(traadfri.LightColour.WARM))
+        elif arguments["--normal"]:
+            coap_put(traadfri.light_colour(traadfri.LightColour.NORMAL))
+        elif arguments["--cold"]:
+            coap_put(traadfri.light_colour(traadfri.LightColour.COLD))
+
+        if (
+            not arguments["--cold"]
+            and not arguments["--warm"]
+            and not arguments["--normal"]
+            and not arguments["--dim"]
+            and not arguments["--off"]
+            and not arguments["--on"]
+        ):
+            output = coap_get()
+            print(output)
