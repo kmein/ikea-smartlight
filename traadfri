@@ -23,12 +23,11 @@ Options:
 from functools import partial
 import os
 import sys
-import time
 
 from docopt import docopt
 from schema import And, Use, Schema
 
-from traadfrilib import traadfri
+from traadfrilib import status, light, uri, coap
 
 
 if __name__ == "__main__":
@@ -54,46 +53,46 @@ if __name__ == "__main__":
     api_key = os.environ["TRAADFRI_KEY"]
 
     if arguments["status"]:
-        coap_get = partial(traadfri.coap_get, api_user, api_key)
+        coap_get = partial(coap.get, api_user, api_key)
 
         bulbs = [
-            coap_get(traadfri.traadfri_bulb(hub_ip, index))
-            for index, _ in enumerate(coap_get(traadfri.traadfri_bulb(hub_ip, None)))
+            coap_get(uri.bulb(hub_ip, index))
+            for index, _ in enumerate(coap_get(uri.bulb(hub_ip, None)))
         ]
 
         for bulb in bulbs:
-            traadfri.print_bulb_info(bulb)
+            status.bulb(bulb)
 
         groups = [
-            coap_get(traadfri.traadfri_group(hub_ip, index))
-            for index, _ in enumerate(coap_get(traadfri.traadfri_group(hub_ip, None)))
+            coap_get(uri.group(hub_ip, index))
+            for index, _ in enumerate(coap_get(uri.group(hub_ip, None)))
         ]
 
         for group in groups:
-            traadfri.print_group_info(group)
+            status.group(group)
     else:
         traadfri_id = int(arguments["<id>"])
 
         if arguments["bulb"]:
-            uri = traadfri.traadfri_bulb(hub_ip, traadfri_id)
+            traadfri_uri = uri.bulb(hub_ip, traadfri_id)
         elif arguments["group"]:
-            uri = traadfri.traadfri_group(hub_ip, traadfri_id)
+            traadfri_uri = uri.group(hub_ip, traadfri_id)
 
-        coap_put = partial(traadfri.coap_put, api_user, api_key, uri)
+        coap_put = partial(coap.put, api_user, api_key, traadfri_uri)
 
         if arguments["--on"]:
-            coap_put(traadfri.light_toggle(False))
+            coap_put(light.toggle(False))
         elif arguments["--off"]:
-            coap_put(traadfri.light_toggle(True))
+            coap_put(light.toggle(True))
 
         if arguments["--dim"]:
             brightness_schema = Schema(And(Use(int), lambda n: 1 <= n <= 100))
             brightness = brightness_schema.validate(arguments["<brightness>"])
-            coap_put(traadfri.light_dim(brightness))
+            coap_put(light.dim(brightness))
 
         if arguments["--warm"]:
-            coap_put(traadfri.light_colour(traadfri.LightColour.WARM))
+            coap_put(light.colour(light.LightColour.WARM))
         elif arguments["--normal"]:
-            coap_put(traadfri.light_colour(traadfri.LightColour.NORMAL))
+            coap_put(light.colour(light.LightColour.NORMAL))
         elif arguments["--cold"]:
-            coap_put(traadfri.light_colour(traadfri.LightColour.COLD))
+            coap_put(light.colour(light.LightColour.COLD))
