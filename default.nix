@@ -1,14 +1,15 @@
-{ python3Packages, lib }:
-python3Packages.buildPythonApplication rec {
-  pname = "ikea-smartlight";
-  version = "2.0.0";
+{ buildPythonApplication, lib, docopt, schema, ansicolors, libcoap }:
+buildPythonApplication rec {
+  pname = "traadfri";
+  version = "2.1.0";
 
   src = ./.;
 
-  propagatedBuildInputs = with python3Packages; [
+  propagatedBuildInputs = [
     docopt
     schema
     ansicolors
+    libcoap
   ];
 
   meta = with lib; {

@@ -7,6 +7,7 @@ the user name in TRAADFRI_USER,
 and the API key in TRAADFRI_KEY.
 
 Usage:
+    traadfri login <hub_ip> <key> <user>
     traadfri (bulb|group) <id> [-h] [--dim=<brightness>] [--colour=<colour>] [--on | --off]
     traadfri status
     traadfri colours
@@ -34,6 +35,18 @@ if __name__ == "__main__":
 
     # print(arguments)
 
+    if arguments["login"]:
+        user = arguments["<user>"]
+        hub_ip = arguments["<hub_ip>"]
+        response = coap.post(
+            "Client_identity",
+            arguments["<key>"],
+            "coaps://{}:5684/15011/9063".format(hub_ip),
+            {9090: user},
+        )
+        key = response["9091"]
+        print(f"TRAADFRI_KEY={key}\nTRAADFRI_USER={user}\nTRAADFRI_HUB={hub_ip}")
+
     if (
         "TRAADFRI_KEY" not in os.environ
         or "TRAADFRI_USER" not in os.environ
@@ -53,22 +66,12 @@ if __name__ == "__main__":
 
     if arguments["status"]:
         coap_get = partial(coap.get, api_user, api_key)
-
-        bulbs = [
-            coap_get(uri.bulb(hub_ip, index))
-            for index, _ in enumerate(coap_get(uri.bulb(hub_ip)))
-        ]
-
-        for bulb in bulbs:
-            status.bulb(bulb)
-
-        groups = [
-            coap_get(uri.group(hub_ip, index))
-            for index, _ in enumerate(coap_get(uri.group(hub_ip)))
-        ]
-
-        for group in groups:
+        for group_id in coap_get(uri.group(hub_ip)):
+            group = coap_get(uri.group(hub_ip, group_id))
             status.group(group)
+            for bulb_id in group["9018"]["15002"]["9003"]:
+                status.bulb(coap_get(uri.bulb(hub_ip, bulb_id)))
+            print()
     elif arguments["colours"]:
         for colour in light.LightColour:
             print(colour.name)
@@ -77,15 +80,15 @@ if __name__ == "__main__":
 
         if arguments["bulb"]:
             traadfri_uri = uri.bulb(hub_ip, traadfri_id)
+            coap_put = partial(coap.put, api_user, api_key, traadfri_uri)
         elif arguments["group"]:
             traadfri_uri = uri.group(hub_ip, traadfri_id)
-
-        coap_put = partial(coap.put, api_user, api_key, traadfri_uri)
+            coap_put = partial(coap.put, api_user, api_key, traadfri_uri, group=True)
 
         if arguments["--on"]:
-            coap_put(light.toggle(False))
-        elif arguments["--off"]:
             coap_put(light.toggle(True))
+        elif arguments["--off"]:
+            coap_put(light.toggle(False))
 
         if arguments["--dim"]:
             brightness_schema = Schema(And(Use(int), lambda n: 1 <= n <= 100))

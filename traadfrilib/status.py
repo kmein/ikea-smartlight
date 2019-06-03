@@ -5,12 +5,15 @@ def group(group: dict):
     try:
         active = group["5850"] == 1
         group_id = group["9003"]
+        brightness = group["5851"]
         group_name = group["9001"]
         print(
-            "{} (#{}): {}",
-            color(group_name, style="bold"),
-            group_id,
-            color("on", fg="green") if active else color("off", fg="red"),
+            "{} {} - {}, {}%".format(
+                group_id,
+                color(group_name, style="bold"),
+                color("on", fg="green") if active else color("off", fg="red"),
+                brightness,
+            )
         )
     except KeyError:
         pass
@@ -23,21 +26,16 @@ def bulb(bulb: dict):
         active = bulb["3311"][0]["5850"] == 1
         brightness = bulb["3311"][0]["5851"]
         try:
-            warmth_raw = float(bulb["3311"][0]["5711"])
-            warmth = round((warmth_raw - 250) / (454 - 250) * 100, 1)
+            colour = ", #{}".format(bulb["3311"][0]["5706"])
         except KeyError:
-            warmth = float("NaN")
+            colour = ""
         print(
-            "{} (#{}): {}, bright {}%, warm {}%".format(
-                color(bulb_name, style="bold"),
+            " {} {} - {}, {}%{}".format(
                 bulb_id,
+                color(bulb_name),
                 color("on", fg="green") if active else color("off", fg="red"),
                 brightness,
-                color(warmth, fg="yellow")
-                if warmth > 66.6
-                else color(warmth, fg="blue")
-                if warmth <= 33.3
-                else warmth,
+                colour,
             )
         )
     except KeyError:

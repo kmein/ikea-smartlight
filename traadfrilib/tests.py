@@ -1,5 +1,4 @@
 import unittest
-from decimal import Decimal
 
 from traadfrilib import light, uri
 
@@ -8,7 +7,7 @@ gateway_ip = "0.0.0.0"
 
 class TestLight(unittest.TestCase):
     def test_dim(self):
-        self.assertEqual({5851: 255}, light.dim(100))
+        self.assertEqual({5851: 254}, light.dim(100))
         self.assertEqual({5851: 0}, light.dim(0))
         self.assertEqual({5851: 127}, light.dim(50))
 

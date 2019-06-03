@@ -1,5 +1,4 @@
 import enum
-from decimal import Decimal, getcontext
 
 
 class LightColour(enum.Enum):
@@ -36,8 +35,7 @@ def toggle(active: bool) -> dict:
 
 def dim(brightness: int) -> dict:
     """Returns the settings payload for dimming a light."""
-    getcontext().prec = 3
-    return {5851: int(brightness * Decimal(2.55))}
+    return {5851: int(brightness * 2.55)}
 
 
 def colour(colour: LightColour) -> dict:
