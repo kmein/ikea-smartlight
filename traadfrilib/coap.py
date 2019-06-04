@@ -1,30 +1,46 @@
 import subprocess
 import json
+import enum
+from typing import Optional
+
+
+class Method(enum.Enum):
+    GET = "get"
+    PUT = "put"
+    POST = "post"
+
+
+def run(
+    method: Method,
+    user: str,
+    key: str,
+    uri: str,
+    payload: Optional[object] = None,
+    timeout: Optional[int] = None,
+) -> Optional[object]:
+    run_process = subprocess.run(
+        ["coap-client", "-m", method.value, "-u", user, "-k", key]
+        + (["-e", json.dumps(payload)] if payload else [])
+        + (["-B", str(timeout)] if timeout else [])
+        + [uri],
+        capture_output=True,
+    )
+    try:
+        return json.loads(run_process.stdout.splitlines()[-1])
+    except json.JSONDecodeError:
+        return None
 
 
 def put(user: str, key: str, uri: str, settings: dict, group: bool = False) -> None:
     """Writes a settings payload to a CoAP URI (using the specified user and API key)."""
-    payload = json.dumps(settings if group else {3311: [settings]})
-    subprocess.run(
-        ["coap-client", "-m", "put", "-u", user, "-k", key, "-e", payload, uri]
-    )
+    payload = settings if group else {3311: [settings]}
+    run(Method.PUT, user, key, uri, payload=payload)
 
 
 def post(user: str, key: str, uri: str, payload: dict) -> object:
-    payload_json = json.dumps(payload)
-    output = subprocess.run(
-        ["coap-client", "-m", "post", "-u", user, "-k", key, "-e", payload_json],
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout
-    return json.loads(output.splitlines()[-1])
+    return run(Method.POST, user, key, uri, payload)
 
 
 def get(user: str, key: str, uri: str, timeout: int = 1) -> object:
     """Reads from a CoAP URI (using the specified user and API key)."""
-    process = subprocess.run(
-        ["coap-client", "-m", "get", "-u", user, "-k", key, "-B", str(timeout), uri],
-        capture_output=True,
-        encoding="utf-8",
-    )
-    return json.loads(process.stdout.splitlines()[-1])
+    return run(Method.GET, user, key, uri, timeout=timeout)
