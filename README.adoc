@@ -1,4 +1,5 @@
 = `traadfri` (formerly ikea-smartlight)
+image:https://img.shields.io/docker/cloud/build/kmein/traadfri.svg?style=flat-square[Docker Cloud Build Status]
 
 IKEA Trådfri (smart lighting) command line interface.
 
@@ -11,6 +12,9 @@ To obtain an API key, run the following in your shell:
 coap-client -m post -u Client_identity -k [Code on the bottom of the gateway] -e '{"9090": "$TRAADFRI_USER"}' coaps://$TRAADFRI_HUB:5684/15011/9063
 
 == Installation
+
+=== Docker
+Use the provided `Dockerfile`.
 
 === Nix
 Use the provided `default.nix` file.
