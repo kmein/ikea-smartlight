@@ -8,7 +8,7 @@ def group(group: dict):
         brightness = group["5851"] / 2.55
         group_name = group["9001"]
         print(
-            "{} {} - {}, {}%".format(
+            "{} {} - {}, {:.1f}%".format(
                 group_id,
                 color(group_name, style="bold"),
                 color("on", fg="green") if active else color("off", fg="red"),
