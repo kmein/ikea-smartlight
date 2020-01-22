@@ -30,7 +30,7 @@ def bulb(bulb: dict):
             coloured_colour = color(f", #{colour}", f"#{colour}")
         except (KeyError, ValueError):
             colour = "ffffff"
-            coloured_colour = colour
+            coloured_colour = ", " + colour
         print(
             " {} {} - {}, {:.1f}%{}".format(
                 bulb_id,
