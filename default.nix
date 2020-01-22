@@ -1,7 +1,7 @@
 { buildPythonApplication, lib, docopt, schema, ansicolors, libcoap }:
 buildPythonApplication rec {
   pname = "traadfri";
-  version = "2.1.2";
+  version = "2.1.3";
 
   src = ./.;
 
