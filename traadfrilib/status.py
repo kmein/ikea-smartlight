@@ -27,7 +27,8 @@ def bulb(bulb: dict):
         brightness = bulb["3311"][0]["5851"] / 2.55
         try:
             colour = bulb["3311"][0]["5706"]
-        except KeyError:
+            coloured_colour = color(f", #{colour}", f"#{colour}")
+        except (KeyError, ValueError):
             colour = "ffffff"
         print(
             " {} {} - {}, {:.1f}%{}".format(
@@ -35,7 +36,7 @@ def bulb(bulb: dict):
                 color(bulb_name),
                 color("on", fg="green") if active else color("off", fg="red"),
                 brightness,
-                color(f", #{colour}", f"#{colour}"),
+                coloured_colour,
             )
         )
     except KeyError:
